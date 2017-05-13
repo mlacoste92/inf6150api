@@ -1,0 +1,37 @@
+extends layout
+
+block content
+    .container
+      legend Contrevenants ayant commis une infraction
+      .row
+        .span6
+          input(type="date", name="du", id="du_input", placeholder="Date de début")
+          br
+          input(type="date", name="au", id="au_input", placeholder="Date de fin")
+          br
+          input.btn.btn-primary(type="button",id="searchBtnDates", name="search", value="Rechercher")
+        .span6
+          select(id="nom_contrevenant", name="nom_contrevenant")
+            each item in etablissements
+              option #{item}
+          br
+          input.btn.btn-primary(type="button",id="searchBtnNom", name="search", value="Rechercher")
+      .row
+        .span6
+          .alert.alert-danger.hidden
+
+    .article
+      table.table.hidden
+        thead
+          tr
+            th Propriétaire
+            th Catégorie
+            th Établissement
+            th Adresse
+            th Ville
+            th Description
+            th Date infraction
+            th Date jugement
+            th Montant
+        tbody
+
