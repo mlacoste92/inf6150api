@@ -50,4 +50,29 @@ router.route('/campings/:id').put(function(req,res,next) {
     });
 });
 
+router.route('/campings/:id/comments').post(function(req,res,next){
+    var id = req.params.id;
+	if(!id){
+	    res.status(400).send({"error" : "Le id doit être un string de 24 caractères hexadécimaux."});
+	    return;
+	}
+	var objectId = ObjectID(id);
+	db.get().collection('campings').findOne({_id:objectId}, function(err, camping) {
+	    if (err) {
+		    res.status(500).send({"error": err});
+		} else if(!camping) {
+			res.status(404).send({"error":"Le camping n'existe pas."});
+		} else {
+			if(camping.comments) {
+			    camping.comments.push(req.body);
+			} else {
+				camping.comments = [req.body]
+			}
+			db.get().collection('campings').findAndModify({_id:objectId},[], {$set:camping},{new:true}, function(err, campingUpdated) {
+			    res.status(200).json(campingUpdated);
+			});
+		}
+	});
+});
+
 module.exports = router;
