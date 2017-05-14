@@ -9,6 +9,18 @@ router.get('/campings', function(req, res, next) {
 	db.get().collection('campings').find().toArray(function(err, campings){
 		res.json(campings);
 	});
+}).post(function(req,res,next){
+    if(req.body == null || Object.keys(req.body).length === 0) {
+		res.status(400).send({"error" : "Aucune donnée reçue"});
+		return;
+	}
+	db.get().collection('campings').insert(req.body, {}, function(err, camping){
+	    if (err) {
+		    res.status(500).send({"error": err});
+		} else {
+			res.status(200).json(camping);
+		}
+	});
 });
 
 router.route('/campings/:id').put(function(req,res,next) {
@@ -31,7 +43,7 @@ router.route('/campings/:id').put(function(req,res,next) {
 	    } else {
 		    res.status(200).json(camping.value);
 	    }
-								  });
+    });
 }).get(function(req,res,next){
     var id = req.params.id;
     if(!id){
@@ -69,7 +81,7 @@ router.route('/campings/:id/comments').post(function(req,res,next){
 				camping.comments = [req.body]
 			}
 			db.get().collection('campings').findAndModify({_id:objectId},[], {$set:camping},{new:true}, function(err, campingUpdated) {
-			    res.status(200).json(campingUpdated);
+			    res.status(200).json(campingUpdated.value);
 			});
 		}
 	});
