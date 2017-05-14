@@ -3,8 +3,7 @@ var router = express.Router();
 var ObjectID = require('mongodb').ObjectID;
 var db = require('../utils/db');
 
-/* GET Liste des contrevenants */
-router.get('/campings', function(req, res, next) {
+router.route('/campings').get(function(req, res, next) {
 	//db.get().collection('campings').find(find_filters).toArray(function(err, campings){
 	db.get().collection('campings').find().toArray(function(err, campings){
 		res.json(campings);
@@ -14,11 +13,11 @@ router.get('/campings', function(req, res, next) {
 		res.status(400).send({"error" : "Aucune donnée reçue"});
 		return;
 	}
-	db.get().collection('campings').insert(req.body, {}, function(err, camping){
+	db.get().collection('campings').insert(req.body, function(err, camping){
 	    if (err) {
 		    res.status(500).send({"error": err});
 		} else {
-			res.status(200).json(camping);
+			res.status(200).json(camping.ops[0]);
 		}
 	});
 });
@@ -68,6 +67,11 @@ router.route('/campings/:id/comments').post(function(req,res,next){
 	    res.status(400).send({"error" : "Le id doit être un string de 24 caractères hexadécimaux."});
 	    return;
 	}
+	if(req.body == null || Object.keys(req.body).length === 0) {
+	    res.status(400).send({"error" : "Aucune donnée reçue"});
+		return;
+	}
+											
 	var objectId = ObjectID(id);
 	db.get().collection('campings').findOne({_id:objectId}, function(err, camping) {
 	    if (err) {
