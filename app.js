@@ -4,8 +4,10 @@ var bodyParser = require('body-parser');
 
 var routeIndex = require('./routes/index');
 var routeCampings = require('./routes/campings');
+var routeServices = require('./routes/services');
+var routeActivities = require('./routes/activities');
 
-var db = require('./utils/db');
+var mongoose = require('mongoose');
 
 var app = express();
 
@@ -26,6 +28,8 @@ app.all('*', function(req, res, next) {
 
 app.use('/', routeIndex);
 app.use('/', routeCampings);
+app.use('/', routeServices);
+app.use('/', routeActivities);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,15 +49,7 @@ app.use(function(err, req, res, next) {
 	});
 	return;
 });
-/* LA DB N'EST PAS ENCORE CRÉEE */
 
-db.init('mongodb://admin:admin@ds137101.mlab.com:37101/camping', function(err) {
-	if (err) {
-		logger.error("Error : Unable to connect to Mongo ");
-		console.log('Unable to connect to Mongo.')
-		process.exit(1)
-	}
-});
-
+mongoose.connect('mongodb://admin:admin@ds137101.mlab.com:37101/camping');
 
 module.exports = app;
