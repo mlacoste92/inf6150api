@@ -29,7 +29,7 @@ var campingSchema = new Schema({
 	  message: { type: String, required: true },
 	  rating: Number
 	}],
-	created_at: Date
+	createdAt: { type: Date, default: Date.now }
 });
 
 // the schema is useless so far
