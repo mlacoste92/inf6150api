@@ -5,13 +5,24 @@ var router = express.Router();
 var ObjectID = require('mongodb').ObjectID;
 
 router.route('/campings').get(function(req, res, next) {
-  Camping.find({}, function(err, campings) {
-	if (err) {
-	  res.status(500).send({"error": err});
-	} else {
-	  res.json(campings);
+	var reqActivities = req.query.activities;
+	var reqServices = req.query.services;
+	var filter = {};
+	if(reqActivities) {
+		filter.activities = {$elemMatch: { id : {$in: reqActivities.split(",")}}};
 	}
-  });
+
+	if(reqServices) {
+		filter.services = {$elemMatch: { id : {$in: reqServices.split(",")}}};
+	}
+
+  	Camping.find(filter, function(err, campings) {
+		if (err) {
+	  		res.status(500).send({"error": err});
+		} else {
+		  	res.json(campings);
+		}
+  	});
 }).post(function(req,res,next){
     if(req.body == null || Object.keys(req.body).length === 0) {
 		res.status(400).send({"error" : "Aucune donnée reçue"});
@@ -88,22 +99,29 @@ router.route('/campings/:id/comments').post(function(req,res,next){
 	var objectId = ObjectID(id);
 											
 	Camping.findById(objectId, function(err, camping) {
-	  if (err) {
-		res.status(500).send({"error": err});
+	  var existingComment = camping.comments.filter(function(sComment){
+			return sComment.userId == req.body.userId;
+	  });
+
+	  if(existingComment.length > 0){
+		res.status(400).send({"error": "This user has already commented the specified camping"});
 	  } else {
-		if(camping.comments) {
-		  camping.comments.push(req.body);
-		} else {
-		  camping.comments = [req.body]
-		}
-					 console.log(camping);
-		camping.save(function(errSave){
-		  if (errSave) {
-			  res.status(500).send({"error": errSave});
-		  } else {
-			  res.status(200).send(camping);
-		  }
-		});
+	  	if (err) {
+			res.status(500).send({"error": err});
+	  	} else {
+			if(camping.comments) {
+		  		camping.comments.push(req.body);
+			} else {
+		  		camping.comments = [req.body]
+			}
+			camping.save(function(errSave){
+		  		if (errSave) {
+					res.status(500).send({"error": errSave});
+		  		} else {
+			  		res.status(200).send(camping);
+		  		}
+			});
+	  	}
 	  }
 	});
 });
