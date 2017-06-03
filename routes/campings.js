@@ -5,15 +5,29 @@ var router = express.Router();
 var ObjectID = require('mongodb').ObjectID;
 
 router.route('/campings').get(function(req, res, next) {
-	var reqActivities = req.query.activities;
-	var reqServices = req.query.services;
 	var filter = {};
-	if(reqActivities) {
-		filter.activities = {$elemMatch: { id : {$in: reqActivities.split(",")}}};
+	if(req.query.activities) {
+		var activitiesFiltered = req.query.activities.split(",");
+		var sElemMatch = "";
+		for (i = 0; i < activitiesFiltered.length; i++) {
+			sElemMatch += (sElemMatch == "") ? "\"id\" : \"" + activitiesFiltered[i] + "\"" : ", \"id\" : \"" + activitiesFiltered[i]+ "\"";
+		}
+		sElemMatch = "{ \"$elemMatch\" :{ " + sElemMatch + "}}";
+		filter.activities = JSON.parse(sElemMatch);
 	}
 
-	if(reqServices) {
-		filter.services = {$elemMatch: { id : {$in: reqServices.split(",")}}};
+	if(req.query.services) {
+		var servicesFiltered = req.query.services.split(",");
+		var sElemMatch = "";
+		for (i = 0; i < servicesFiltered.length; i++) {
+			sElemMatch += (sElemMatch == "") ? "\"id\" : \"" + servicesFiltered[i] + "\"" : ", \"id\" : \"" + servicesFiltered[i]+ "\"";
+		}
+		sElemMatch = "{ \"$elemMatch\" :{ " + sElemMatch + "}}";
+		filter.services = JSON.parse(sElemMatch);
+	}
+
+	if(req.query.name){
+		filter.name = req.query.name;
 	}
 
   	Camping.find(filter, function(err, campings) {
