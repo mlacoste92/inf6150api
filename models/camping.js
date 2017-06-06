@@ -26,6 +26,7 @@ var campingSchema = new Schema({
 	details: String,
     comments: [{
 	  userId: { type: String, required: true, unique:true},
+	  userName: { type: String, required: true},
 	  message: { type: String, required: true },
 	  rating: Number
 	}],
