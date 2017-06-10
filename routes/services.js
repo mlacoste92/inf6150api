@@ -17,7 +17,6 @@ router.route('/services').get(function(req, res, next) {
 		return;
 	}
 	var newService = Service(req.body);
-		
 	newService.save(function(err) {
 	  if (err) {
 		res.status(500).send({"error": err});
