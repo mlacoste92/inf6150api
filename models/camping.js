@@ -9,6 +9,7 @@ var campingSchema = new Schema({
 	telephone: { type: String, required: true},
 	postalCode: { type: String, required: true},
 	province: { type: String, required: true},
+	status: {type:Boolean, default:true},
 	geolocalisation: {
 	  lat: { type: String, required: true },
 	  lng: { type: String, required: true }
